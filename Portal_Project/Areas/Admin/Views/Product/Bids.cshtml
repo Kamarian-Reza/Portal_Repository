@@ -1,0 +1,106 @@
+﻿@model IEnumerable<Portal_Project.Models.Portal.DMC.Bid>
+
+@{
+    Product product = (Product)ViewBag.Product;
+    string winner = (string)ViewBag.Winner;
+
+    ViewData["Title"] = "Bids";
+}
+
+<h1><i class="fas fa-list"></i> @ViewData["Title"]</h1>
+
+@if (Model.Any() && product.Status == Product_Status.OnSale)
+{
+    <form asp-area="Admin" asp-controller="Product" asp-action="Close" method="post">
+        <input type="hidden" name="id" value="@product.ProductID" />
+
+        <button type="submit" class="btn">
+            <i class="far fa-stop-circle"></i> Close
+        </button>
+    </form>
+}
+
+@if (product.Status == Product_Status.OnSale)
+{
+    <form asp-area="Admin" asp-controller="Product" asp-action="Cancel" method="post">
+        <input type="hidden" name="id" value="@product.ProductID" />
+
+        <button type="submit" class="btn">
+            <i class="far fa-window-close"></i> Cancel
+        </button>
+    </form>
+}
+
+<p>
+    <a asp-area="Admin" asp-controller="Product" asp-action="Index"><i class="fas fa-undo-alt"></i> Return</a>
+</p>
+
+<h2 style="text-align: center;">Product Info</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>Product Name</td>
+            <td>Base Price</td>
+            <td>Status</td>
+            <td>Winner</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@product.Name</td>
+            <td>@product.BasePrice</td>
+            <td>@product.StatusTitle</td>
+            <td>@winner</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 class="mt-5" style="text-align: center;">Product Bids</h2>
+
+<table class="table" title="Product Info">
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+
+            <th>
+                User
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            int rowNumber = 0;
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @(++rowNumber)
+                    </td>
+
+                    <td>
+                        @item.ApplicationUser.FirstName @item.ApplicationUser.LastName
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">No record found...</td>
+            </tr>
+        }
+    </tbody>
+</table>
