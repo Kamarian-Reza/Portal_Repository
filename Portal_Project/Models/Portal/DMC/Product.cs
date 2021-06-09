@@ -84,6 +84,8 @@ namespace Portal_Project.Models.Portal.DMC
         [ForeignKey("UserID")]
         [Display(Name = "Product ID")]
         public ApplicationUser ApplicationUser { get; set; }
+
+        public IEnumerable<Bid> Bids { get; set; }
     }
 
     public enum Product_Status

@@ -16,6 +16,7 @@ namespace Portal_Project.Data
         }
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Bid> Bids { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

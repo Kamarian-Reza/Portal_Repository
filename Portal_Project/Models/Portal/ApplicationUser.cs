@@ -22,5 +22,6 @@ namespace Portal_Project.Models.Portal
 
         // Navigation Properties
         public IEnumerable<Product> Products { get; set; }
+        public IEnumerable<Bid> Bids { get; set; }
     }
 }
