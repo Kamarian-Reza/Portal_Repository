@@ -1,0 +1,54 @@
+﻿@model Portal_Project.Areas.Admin.Models.Portal.VMC.UserVM
+
+@{
+    bool isDeletable = (bool)ViewBag.IsDeletable;
+
+    ViewData["Title"] = "Delete User";
+}
+
+<div class="col-md-8 offset-md-2">
+    <h4 style="text-align: center;"><i class="far fa-trash-alt"></i> @ViewData["Title"]</h4>
+    <hr />
+
+    <h5>Are you sure?</h5>
+
+    <dl class="row mt-4">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.NationalID)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.NationalID)
+        </dd>
+
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        @if (!isDeletable)
+        {
+            <button type="button" id="tooltip-1" class="btn btn-sm btn-danger col-sm-12 col-md-3 col-lg-2 m-1" data-toggle="tooltip" data-placement="top" title="There is offer/offers from this user. You cant delete it.">
+                Delete
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-sm btn-danger col-sm-12 col-md-3 col-lg-2 m-1"><i class="far fa-trash-alt"></i> Delete</button>
+        }
+
+        <a asp-action="Index" class="btn btn-sm btn-secondary col-sm-12 col-md-3 col-lg-2 m-1"><i class="fas fa-undo-alt text-110 ml-2"></i> Cancel</a>
+    </form>
+</div>

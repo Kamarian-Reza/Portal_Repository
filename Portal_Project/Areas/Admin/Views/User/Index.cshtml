@@ -1,0 +1,73 @@
+﻿@model IEnumerable<ApplicationUser>
+
+@{
+    ViewData["Title"] = "Users List";
+}
+
+<h4 style="text-align: center;"><i class="fas fa-list"></i> @ViewData["Title"]</h4>
+
+<p class="row">
+    <a asp-action="Create" class="btn btn-sm btn-purple mt-1 mx-1"><i class="fas fa-plus"></i> New</a>
+
+    <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-pink mt-1 mx-1"><i class="fas fa-undo-alt"></i> Return</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+
+            <th>Commands</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            int rowNumber = 0;
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(++rowNumber)</td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" title="Details" class="mr-2"><i class="fas fa-info"></i></a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" title="Edit" class="mr-2"><i class="far fa-edit"></i></a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" title="Delete"><i class="far fa-trash-alt"></i></a>
+                    </td>
+                </tr>
+            }
+        }
+
+        else
+        {
+            <tr>
+                <td colspan="5" style="text-align: center;">No data found...</td>
+            </tr>
+        }
+    </tbody>
+</table>
