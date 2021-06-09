@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Portal_Project.Areas.Admin.Models.Portal.VMC;
+using Portal_Project.Data;
 using Portal_Project.Models.Portal;
 using System;
 using System.Collections.Generic;
@@ -14,17 +16,20 @@ namespace Portal_Project.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IPasswordValidator<ApplicationUser> _passwordValidator;
         private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
 
         public UserController(UserManager<ApplicationUser> userManager,
                               IPasswordValidator<ApplicationUser> passwordValidator,
-                              IPasswordHasher<ApplicationUser> passwordHasher)
+                              IPasswordHasher<ApplicationUser> passwordHasher,
+                              ApplicationDbContext context)
         {
             _userManager = userManager;
             _passwordValidator = passwordValidator;
             _passwordHasher = passwordHasher;
+            _context = context;
         }
 
         public IActionResult Index()
@@ -204,7 +209,7 @@ namespace Portal_Project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            bool isDeletable = true;
+            bool isDeletable = ! await _context.Bids.AnyAsync(b => b.UserID == user.Id);
             ViewData["IsDeletable"] = isDeletable;
 
             UserVM model = new UserVM()

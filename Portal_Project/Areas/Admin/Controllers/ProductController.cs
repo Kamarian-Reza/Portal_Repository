@@ -82,7 +82,7 @@ namespace Portal_Project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            bool isEditable = model.Status == Product_Status.Canceled ? true : false;
+            bool isEditable = model.Status != Product_Status.Saled ? true : false;
             ViewData["IsEditable"] = isEditable;
 
             return View(model);
@@ -148,7 +148,9 @@ namespace Portal_Project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            bool isDeletable = true;
+            bool isDeletable = await _context.Bids
+                                             .AnyAsync(b => b.ProductID == model.ProductID);
+
             ViewData["IsDeletable"] = isDeletable;
 
             return View(model);
