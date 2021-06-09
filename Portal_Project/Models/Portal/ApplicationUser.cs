@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Portal_Project.Models.Portal.DMC;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -20,5 +21,6 @@ namespace Portal_Project.Models.Portal
         public string LastName { get; set; }
 
         // Navigation Properties
+        public IEnumerable<Product> Products { get; set; }
     }
 }
