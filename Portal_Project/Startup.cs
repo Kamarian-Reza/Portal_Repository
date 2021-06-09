@@ -31,10 +31,32 @@ namespace Portal_Project
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Portal_CS")));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+                                                                    {
+                                                                        /* Password Policies */
+                                                                        options.Password.RequiredLength = 6;
+                                                                        options.Password.RequireDigit = true;
+                                                                        options.Password.RequireLowercase = false;
+                                                                        options.Password.RequireUppercase = false;
+                                                                        options.Password.RequiredUniqueChars = 3;
+                                                                        options.Password.RequireNonAlphanumeric = false;
+                                                                        /* User Policies */
+                                                                        options.User.RequireUniqueEmail = false;
+                                                                        /* Lockout Policies */
+                                                                        options.Lockout.MaxFailedAccessAttempts = 5;
+                                                                        options.Lockout.AllowedForNewUsers = true;
+                                                                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+                                                                        /*SignIn Policies */
+                                                                        options.SignIn.RequireConfirmedAccount = false;
+                                                                        options.SignIn.RequireConfirmedEmail = false;
+                                                                        options.SignIn.RequireConfirmedPhoneNumber = false;
+                                                                        /* Token Policies */
+                                                                        options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
+                                                                    })
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,6 +88,10 @@ namespace Portal_Project
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
+
+            // Create Defaults
+            CreateDefaults.Roles(app).Wait();
+            CreateDefaults.Users(app, Configuration).Wait();
         }
     }
 }
