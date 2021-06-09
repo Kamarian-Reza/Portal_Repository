@@ -22,7 +22,6 @@
     <Folder Include="Areas\User\Models\" />
     <Folder Include="Areas\User\Views\Shared\" />
     <Folder Include="Models\Portal\DMC\" />
-    <Folder Include="Models\Portal\VMC\" />
   </ItemGroup>
 
 </Project>
