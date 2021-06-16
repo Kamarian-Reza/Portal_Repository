@@ -9,56 +9,86 @@ namespace Portal_Model.Models
 {
     public class Product
     {
-        public Product(string name, int price)
+        public Product(int productId,
+                       string userId,
+                       string name,
+                       decimal basePrice,
+                       DateTime createDate,
+                       Product_Status_Enum status,
+                       Product_Mode_Enum mode)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentException("You can not pass empty string value to product name");
-            }
-
-            if (name.Length > 50)
-            {
-                throw new ArgumentException("Product name lenght can not be more than 50 characters");
-            }
-
-            if (price < 0)
-            {
-                throw new ArgumentOutOfRangeException("Product price can not be negative.");
-            }
-
-            if (price > 1000)
-            {
-                throw new ArgumentOutOfRangeException("Product price can not be more than 1000$.");
-            }
-
+            ProductID = productId;
+            UserID = userId;
             Name = name;
-            BasePrice = price;
-            CreateTime = DateTime.Now;
-            Status = Product_Status_Enum.OnSale;
+            BasePrice = basePrice;
+            CreateTime = mode == Product_Mode_Enum.Create ? DateTime.Now : createDate;
+            Status = status;
+            Mode = mode;
         }
 
-        public void ProductSaled()
+        List<string> brokenRules = new List<string>();
+
+        public IReadOnlyList<string> IsValid()
         {
-            Status = Product_Status_Enum.Saled;
+            // Product ID
+            if ((Mode != Product_Mode_Enum.Create) && (ProductID <= 0))
+                brokenRules.Add("Invalid ProductID");
+
+            if ((Mode == Product_Mode_Enum.Create) && (ProductID != 0))
+                brokenRules.Add("Invalid ProductID");
+
+            // User ID
+            if (string.IsNullOrEmpty(UserID))
+                brokenRules.Add("Invalid UserID");
+
+            // Name
+            if (string.IsNullOrEmpty(Name))
+                brokenRules.Add("Product name can not be null / empty");
+
+            if (!string.IsNullOrEmpty(Name) && Name.Length > 50)
+                brokenRules.Add("Product name lengh coud not be more than 50 charachters");
+
+            // Price
+            if (BasePrice < 0)
+                brokenRules.Add("Product base price coud not be negative");
+
+            if (BasePrice > 1000)
+                brokenRules.Add("Product base price coud not more than 1000");
+
+            // Status
+            if ((Mode == Product_Mode_Enum.Create) && (Status != Product_Status_Enum.OnSale))
+                brokenRules.Add("On create product, status must be On Sale");
+
+            return brokenRules;
         }
 
-        public void ProductCanceled()
+        public void Sold()
+        {
+            Status = Product_Status_Enum.Sold;
+        }
+
+        public IReadOnlyList<string> Cancel()
         {
             if (DateTime.Now > CreateTime.AddDays(1))
             {
-                throw new Exception("You cand cancel your product, after 24h!");
+                brokenRules.Add("On create product, status must be On Sale");
             }
-            
-            Status = Product_Status_Enum.Canceled;
+            else
+            {
+                Status = Product_Status_Enum.Canceled;
+            }
+
+            return brokenRules;
         }
 
-        public int ProductID { get; set; }
-        public string UserID { get; set; }
+        public int ProductID { get; private set; }
+        public string UserID { get; private set; }
         public string Name { get; private set; }
         public decimal BasePrice { get; private set; }
         public DateTime CreateTime { get; private set; }
         public Product_Status_Enum Status { get; private set; }
-
+        public Product_Mode_Enum Mode { get; private set; }
+        
         // Navigation Properties
     }
 
@@ -67,10 +97,22 @@ namespace Portal_Model.Models
         [Display(Name = "On Sale")]
         OnSale = 1,
 
-        [Display(Name = "Saled")]
-        Saled = 2,
+        [Display(Name = "Sold")]
+        Sold = 2,
 
         [Display(Name = "Canceled")]
         Canceled = 3
+    }
+
+    public enum Product_Mode_Enum
+    {
+        [Display(Name = "Create")]
+        Create = 1,
+
+        [Display(Name = "Update")]
+        Update = 2,
+
+        [Display(Name = "Read")]
+        Read = 3
     }
 }

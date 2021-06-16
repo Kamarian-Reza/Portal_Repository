@@ -1,110 +1,115 @@
 using System;
 using Xunit;
 using Portal_Model.Models;
+using System.Collections.Generic;
 
 namespace Portal_Test
 {
     public class ProductTets
     {
-        [Fact]
-        public void ErrorIfNameBeNull()
-        {
-            Product product;
-
-            Assert.Throws<ArgumentException>(() => product = new Product(null, 100));
-        }
-
-        [Fact]
-        public void ErrorIfNameBeEmpty()
-        {
-            Product product;
-
-            Assert.Throws<ArgumentException>(() => product = new Product("", 100));
-        }
-
-        [Fact]
-        public void ErrorIfNameLenghtMoreThan50Chars()
-        {
-            Product product;
-
-            Assert.Throws<ArgumentException>(() => product = new Product("012345678901234567890123456789012345678901234567890", 100));
-        }
-
-        [Fact]
-        public void NameCheck()
+        [Theory]
+        [InlineData(-1, Product_Mode_Enum.Create, false)]
+        [InlineData(0, Product_Mode_Enum.Create, true)]
+        [InlineData(1, Product_Mode_Enum.Create, false)]
+        [InlineData(-1, Product_Mode_Enum.Update, false)]
+        [InlineData(0, Product_Mode_Enum.Update, false)]
+        [InlineData(1, Product_Mode_Enum.Update, true)]
+        [InlineData(-1, Product_Mode_Enum.Read, false)]
+        [InlineData(0, Product_Mode_Enum.Read, false)]
+        [InlineData(1, Product_Mode_Enum.Read, true)]
+        public void ProductIDRules(int id, Product_Mode_Enum mode, bool expectedResult)
         {
             // Arrange
-            Product product1;
-            Product product2;
-
-            // Act
-            product1 = new Product("Book", 100);
-            product2 = new Product("01234567890123456789012345678901234567890123456789", 100);
-
-            // Assert
-            Assert.Equal("Book", product1.Name);
-            Assert.Equal("01234567890123456789012345678901234567890123456789", product2.Name);
-        }
-
-        [Fact]
-        public void ErrorIfPriceBeNegative()
-        {
             Product product;
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => product = new Product("Book", -1));
+            // Act
+            product = new Product(id, "1", "Book", 1, DateTime.Now, Product_Status_Enum.OnSale, mode);
+
+            // Assert
+            Assert.Equal(expectedResult, product.IsValid().Count == 0);
         }
 
-        [Fact]
-        public void ErrorIfPriceMoreThan1000()
+        [Theory]
+        [InlineData(null, false)]
+        [InlineData("", false)]
+        public void UserIDRules(string userId, bool expectedResult)
         {
+            // Arrange
             Product product;
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => product = new Product("Book", 1001));
-        }
-
-        [Fact]
-        public void PriceCheck()
-        {
-            // Arrange
-            Product product1;
-            Product product2;
-            Product product3;
-
             // Act
-            product1 = new Product("Book", 0);
-            product2 = new Product("Book", 1);
-            product3 = new Product("Book", 1000);
+            product = new Product(1, userId, "Book", 1, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
 
             // Assert
-            Assert.Equal(0, product1.BasePrice);
-            Assert.Equal(1, product2.BasePrice);
-            Assert.Equal(1000, product3.BasePrice);
+            Assert.Equal(expectedResult, product.IsValid().Count == 0);
         }
 
-        [Fact]
-        public void ChangeStatusToCancel()
+        [Theory]
+        [InlineData(null, false)]
+        [InlineData("", false)]
+        [InlineData("Book", true)]
+        [InlineData("01234567890123456789012345678901234567890123456789", true)]
+        [InlineData("012345678901234567890123456789012345678901234567890", false)]
+        public void NameRules(string name, bool expectedResult)
         {
             // Arrange
-            Product product = new Product("Book", 100);
-
+            Product product;
+            
             // Act
-            product.ProductCanceled();
+            product = new Product(1, "1", name, 1, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
 
             // Assert
-            Assert.Equal(Product_Status_Enum.Canceled, product.Status);
+            Assert.Equal(expectedResult, product.IsValid().Count == 0);
         }
 
-        [Fact]
-        public void ChangeStatusToSaled()
+        [Theory]
+        [InlineData(-1, false)]
+        [InlineData(0, true)]
+        [InlineData(1, true)]
+        [InlineData(1000, true)]
+        [InlineData(1001, false)]
+        public void BasePriceRules(decimal basePrice, bool expectedResult)
         {
             // Arrange
-            Product product = new Product("Book", 100);
+            Product product;
 
             // Act
-            product.ProductSaled();
+            product = new Product(1, "1", "Book", basePrice, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
 
             // Assert
-            Assert.Equal(Product_Status_Enum.Saled, product.Status);
+            Assert.Equal(expectedResult, product.IsValid().Count == 0);
+        }
+
+        [Theory]
+        [InlineData(Product_Status_Enum.OnSale, true)]
+        [InlineData(Product_Status_Enum.Sold, false)]
+        [InlineData(Product_Status_Enum.Canceled, false)]
+        public void StatusRules(Product_Status_Enum status, bool expectedResult)
+        {
+            // Arrange
+            Product product;
+
+            // Act
+            product = new Product(0, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Create);
+
+            // Assert
+            Assert.Equal(expectedResult, product.IsValid().Count == 0);
+        }
+
+        [Theory]
+        [InlineData(Product_Status_Enum.OnSale, true)]
+        [InlineData(Product_Status_Enum.Sold, false)]
+        [InlineData(Product_Status_Enum.Canceled, false)]
+        public void ChangingStatus(Product_Status_Enum status, bool expectedResult)
+        {
+            // Arrange
+            Product product;
+
+            // Act
+            product = new Product(0, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Create);
+
+            // Assert
+            Assert.Equal(expectedResult, product.IsValid().Count == 0);
         }
     }
 }
