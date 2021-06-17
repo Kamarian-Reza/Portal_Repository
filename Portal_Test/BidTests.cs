@@ -10,28 +10,58 @@ namespace Portal_Test
 {
     public class BidTests
     {
-        [Fact]
-        public void ErrorIfPriceBeNegative()
-        {
-            Bid bid;
-
-            Assert.Throws<ArgumentOutOfRangeException>(() => bid = new Bid(-1));
-        }
-
-        [Fact]
-        public void PriceCheck()
+        [Theory]
+        [InlineData(-1, Bid_Mode_Enum.Create, false)]
+        [InlineData(0, Bid_Mode_Enum.Create, true)]
+        [InlineData(1, Bid_Mode_Enum.Create, false)]
+        [InlineData(-1, Bid_Mode_Enum.Update, false)]
+        [InlineData(0, Bid_Mode_Enum.Update, false)]
+        [InlineData(1, Bid_Mode_Enum.Update, true)]
+        [InlineData(-1, Bid_Mode_Enum.Read, false)]
+        [InlineData(0, Bid_Mode_Enum.Read, false)]
+        [InlineData(1, Bid_Mode_Enum.Read, true)]
+        public void BidIDRules(int bidId, Bid_Mode_Enum mode, bool expectedResult)
         {
             // Arrange
-            Bid bid1;
-            Bid bid2;
+            Bid bid;
 
             // Act
-            bid1 = new Bid(0);
-            bid2 = new Bid(1);
+            bid = new Bid(bidId, 1, "1", 1, mode);
 
             // Assert
-            Assert.Equal(0, bid1.Price);
-            Assert.Equal(1, bid2.Price);
+            Assert.Equal(expectedResult, bid.IsValid().Count == 0);
+        }
+
+        [Theory]
+        [InlineData(null, false)]
+        [InlineData("", false)]
+        [InlineData("1", true)]
+        public void UserIDRules(string userId, bool expectedResult)
+        {
+            // Arrange
+            Bid bid;
+
+            // Act
+            bid = new Bid(1, 1, userId, 1, Bid_Mode_Enum.Read);
+
+            // Assert
+            Assert.Equal(expectedResult, bid.IsValid().Count == 0);
+        }
+
+        [Theory]
+        [InlineData(-1, false)]
+        [InlineData(0, true)]
+        [InlineData(1, true)]
+        public void PriceRules(decimal price, bool expectedResult)
+        {
+            // Arrange
+            Bid bid;
+
+            // Act
+            bid = new Bid(1, 1, "1", price, Bid_Mode_Enum.Read);
+
+            // Assert
+            Assert.Equal(expectedResult, bid.IsValid().Count == 0);
         }
     }
 }

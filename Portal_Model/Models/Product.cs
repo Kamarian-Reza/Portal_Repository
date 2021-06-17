@@ -62,16 +62,29 @@ namespace Portal_Model.Models
             return brokenRules;
         }
 
-        public void Sold()
+        public IReadOnlyList<string> Sold()
         {
-            Status = Product_Status_Enum.Sold;
+            if (Status == Product_Status_Enum.OnSale)
+            {
+                Status = Product_Status_Enum.Sold;
+            }
+            else
+            {
+                brokenRules.Add("You cant sold the product/s that has already Solded / canceled");
+            }
+
+            return brokenRules;
         }
 
         public IReadOnlyList<string> Cancel()
         {
-            if (DateTime.Now > CreateTime.AddDays(1))
+            if (DateTime.Now > CreateTime.AddHours(24))
             {
                 brokenRules.Add("On create product, status must be On Sale");
+            }
+            else if (Status != Product_Status_Enum.OnSale)
+            {
+                brokenRules.Add("You cant cancel the product/s that has already Solded / canceled");
             }
             else
             {

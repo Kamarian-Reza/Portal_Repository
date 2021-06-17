@@ -32,6 +32,7 @@ namespace Portal_Test
         [Theory]
         [InlineData(null, false)]
         [InlineData("", false)]
+        [InlineData("1", true)]
         public void UserIDRules(string userId, bool expectedResult)
         {
             // Arrange
@@ -84,7 +85,7 @@ namespace Portal_Test
         [InlineData(Product_Status_Enum.OnSale, true)]
         [InlineData(Product_Status_Enum.Sold, false)]
         [InlineData(Product_Status_Enum.Canceled, false)]
-        public void StatusRules(Product_Status_Enum status, bool expectedResult)
+        public void OnSaleStatus(Product_Status_Enum status, bool expectedResult)
         {
             // Arrange
             Product product;
@@ -100,16 +101,48 @@ namespace Portal_Test
         [InlineData(Product_Status_Enum.OnSale, true)]
         [InlineData(Product_Status_Enum.Sold, false)]
         [InlineData(Product_Status_Enum.Canceled, false)]
-        public void ChangingStatus(Product_Status_Enum status, bool expectedResult)
+        public void SoldStatus(Product_Status_Enum status, bool expectedResult)
         {
             // Arrange
-            Product product;
+            Product product = new Product(1, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Update); ;
 
             // Act
-            product = new Product(0, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Create);
+            product.Sold();
 
             // Assert
             Assert.Equal(expectedResult, product.IsValid().Count == 0);
+        }
+
+        [Theory]
+        [InlineData(Product_Status_Enum.OnSale, true)]
+        [InlineData(Product_Status_Enum.Sold, false)]
+        [InlineData(Product_Status_Enum.Canceled, false)]
+        public void CancelStatus(Product_Status_Enum status, bool expectedResult)
+        {
+            // Arrange
+            Product product = new Product(1, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Update); ;
+
+            // Act
+            product.Cancel();
+
+            // Assert
+            Assert.Equal(expectedResult, product.IsValid().Count == 0);
+        }
+
+        [Fact]
+        public void CancelTime()
+        {
+            // Arrange
+            Product product1 = new Product(1, "1", "Book", 1, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Update);
+            Product product2 = new Product(1, "1", "Book", 1, DateTime.Now.AddHours(-25), Product_Status_Enum.OnSale, Product_Mode_Enum.Update);
+
+            // Act
+            product1.Cancel();
+            product2.Cancel();
+
+            // Assert
+            Assert.True(product1.IsValid().Count == 0);
+            Assert.False(product2.IsValid().Count == 0);
         }
     }
 }
