@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Portal_Model.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,8 +13,10 @@ namespace Portal_Model.Models
         public Product(int productId,
                        string userId,
                        string name,
-                       decimal basePrice,
+                       Money basePrice,
                        DateTime createDate,
+                       Size size,
+                       Weight weight,
                        Product_Status_Enum status,
                        Product_Mode_Enum mode)
         {
@@ -21,6 +24,8 @@ namespace Portal_Model.Models
             UserID = userId;
             Name = name;
             BasePrice = basePrice;
+            Size = size;
+            Weight = weight;
             CreateTime = mode == Product_Mode_Enum.Create ? DateTime.Now : createDate;
             Status = status;
             Mode = mode;
@@ -48,11 +53,9 @@ namespace Portal_Model.Models
             if (!string.IsNullOrEmpty(Name) && Name.Length > 50)
                 brokenRules.Add("Product name lengh coud not be more than 50 charachters");
 
-            // Price
-            if (BasePrice < 0)
-                brokenRules.Add("Product base price coud not be negative");
 
-            if (BasePrice > 1000)
+            // Price
+            if (BasePrice.Value.Value > 1000)
                 brokenRules.Add("Product base price coud not more than 1000");
 
             // Status
@@ -94,11 +97,13 @@ namespace Portal_Model.Models
             return brokenRules;
         }
 
-        public int ProductID { get; private set; }
-        public string UserID { get; private set; }
-        public string Name { get; private set; }
-        public decimal BasePrice { get; private set; }
-        public DateTime CreateTime { get; private set; }
+        public int ProductID { get; }
+        public string UserID { get; }
+        public string Name { get; }
+        public Money BasePrice { get; }
+        public DateTime CreateTime { get; }
+        public Size Size { get; }
+        public Weight Weight { get; }
         public Product_Status_Enum Status { get; private set; }
         public Product_Mode_Enum Mode { get; private set; }
         

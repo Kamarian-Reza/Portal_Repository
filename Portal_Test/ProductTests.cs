@@ -2,6 +2,7 @@ using System;
 using Xunit;
 using Portal_Model.Models;
 using System.Collections.Generic;
+using Portal_Model.Common;
 
 namespace Portal_Test
 {
@@ -22,8 +23,13 @@ namespace Portal_Test
             // Arrange
             Product product;
 
+            Money basePrice = new Money(new Measure(1));
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+
             // Act
-            product = new Product(id, "1", "Book", 1, DateTime.Now, Product_Status_Enum.OnSale, mode);
+
+            product = new Product(id, "1", "Book", basePrice, DateTime.Now, size, weight, Product_Status_Enum.OnSale, mode);
 
             // Assert
             Assert.Equal(expectedResult, product.IsValid().Count == 0);
@@ -38,8 +44,12 @@ namespace Portal_Test
             // Arrange
             Product product;
 
+            Money basePrice = new Money(new Measure(1));
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+
             // Act
-            product = new Product(1, userId, "Book", 1, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
+            product = new Product(1, userId, "Book", basePrice, DateTime.Now, size, weight, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
 
             // Assert
             Assert.Equal(expectedResult, product.IsValid().Count == 0);
@@ -55,27 +65,43 @@ namespace Portal_Test
         {
             // Arrange
             Product product;
-            
+
+            Money basePrice = new Money(new Measure(1));
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+
             // Act
-            product = new Product(1, "1", name, 1, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
+            product = new Product(1, "1", name, basePrice, DateTime.Now, size, weight, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
 
             // Assert
             Assert.Equal(expectedResult, product.IsValid().Count == 0);
         }
 
+        [Fact]
+        public void BasePriceException()
+        {
+            // Arrange
+            Measure measure;
+
+            // Act & Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => measure = new Measure(-1));
+        }
+        
         [Theory]
-        [InlineData(-1, false)]
         [InlineData(0, true)]
         [InlineData(1, true)]
         [InlineData(1000, true)]
         [InlineData(1001, false)]
-        public void BasePriceRules(decimal basePrice, bool expectedResult)
+        public void BasePriceRules(int basePrice, bool expectedResult)
         {
             // Arrange
             Product product;
 
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+
             // Act
-            product = new Product(1, "1", "Book", basePrice, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
+            product = new Product(1, "1", "Book", new Money(new Measure(basePrice)), DateTime.Now, size, weight, Product_Status_Enum.OnSale, Product_Mode_Enum.Read);
 
             // Assert
             Assert.Equal(expectedResult, product.IsValid().Count == 0);
@@ -90,8 +116,12 @@ namespace Portal_Test
             // Arrange
             Product product;
 
+            Money basePrice = new Money(new Measure(1));
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+
             // Act
-            product = new Product(0, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Create);
+            product = new Product(0, "1", "Book", basePrice, DateTime.Now, size, weight, status, Product_Mode_Enum.Create);
 
             // Assert
             Assert.Equal(expectedResult, product.IsValid().Count == 0);
@@ -104,7 +134,11 @@ namespace Portal_Test
         public void SoldStatus(Product_Status_Enum status, bool expectedResult)
         {
             // Arrange
-            Product product = new Product(1, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Update); ;
+            Money basePrice = new Money(new Measure(1));
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+
+            Product product = new Product(1, "1", "Book", basePrice, DateTime.Now, size, weight, status, Product_Mode_Enum.Update); ;
 
             // Act
             product.Sold();
@@ -120,7 +154,11 @@ namespace Portal_Test
         public void CancelStatus(Product_Status_Enum status, bool expectedResult)
         {
             // Arrange
-            Product product = new Product(1, "1", "Book", 1, DateTime.Now, status, Product_Mode_Enum.Update); ;
+            Money basePrice = new Money(new Measure(1));
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+
+            Product product = new Product(1, "1", "Book", basePrice, DateTime.Now, size, weight, status, Product_Mode_Enum.Update); ;
 
             // Act
             product.Cancel();
@@ -133,8 +171,12 @@ namespace Portal_Test
         public void CancelTime()
         {
             // Arrange
-            Product product1 = new Product(1, "1", "Book", 1, DateTime.Now, Product_Status_Enum.OnSale, Product_Mode_Enum.Update);
-            Product product2 = new Product(1, "1", "Book", 1, DateTime.Now.AddHours(-25), Product_Status_Enum.OnSale, Product_Mode_Enum.Update);
+            Money basePrice = new Money(new Measure(1));
+            Size size = new Size(new Measure(1), new Measure(1), new Measure(1));
+            Weight weight = new Weight(new Measure(1));
+            
+            Product product1 = new Product(1, "1", "Book", basePrice, DateTime.Now, size, weight, Product_Status_Enum.OnSale, Product_Mode_Enum.Update);
+            Product product2 = new Product(1, "1", "Book", basePrice, DateTime.Now.AddHours(-25), size, weight, Product_Status_Enum.OnSale, Product_Mode_Enum.Update);
 
             // Act
             product1.Cancel();

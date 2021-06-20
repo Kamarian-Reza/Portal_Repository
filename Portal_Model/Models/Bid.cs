@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Portal_Model.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -9,7 +10,7 @@ namespace Portal_Model.Models
 {
     public class Bid
     {
-        public Bid(int bidId, int productId, string userId, decimal price, Bid_Mode_Enum mode)
+        public Bid(int bidId, int productId, string userId, Money price, Bid_Mode_Enum mode)
         {
             BidID = bidId;
             ProductID = productId;
@@ -33,20 +34,16 @@ namespace Portal_Model.Models
             if (string.IsNullOrEmpty(UserID))
                 brokenRules.Add("Invalid UserID");
 
-            // Price
-            if (Price < 0)
-                brokenRules.Add("Bid price coud not be negative");
-
             return brokenRules;
         }
 
-        public int BidID { get; private set; }
+        public int BidID { get; }
 
-        public int ProductID { get; private set; }
+        public int ProductID { get; }
 
-        public string UserID { get; private set; }
+        public string UserID { get; }
 
-        public decimal Price { get; private set; }
+        public Money Price { get; }
         public Bid_Mode_Enum Mode { get; private set; }
 
         // Navigation Properties

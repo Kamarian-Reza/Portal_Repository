@@ -1,4 +1,5 @@
-﻿using Portal_Model.Models;
+﻿using Portal_Model.Common;
+using Portal_Model.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +25,10 @@ namespace Portal_Test
         {
             // Arrange
             Bid bid;
+            Money price = new Money(new Measure(1));
 
             // Act
-            bid = new Bid(bidId, 1, "1", 1, mode);
+            bid = new Bid(bidId, 1, "1", price, mode);
 
             // Assert
             Assert.Equal(expectedResult, bid.IsValid().Count == 0);
@@ -40,25 +42,35 @@ namespace Portal_Test
         {
             // Arrange
             Bid bid;
+            Money price = new Money(new Measure(1));
 
             // Act
-            bid = new Bid(1, 1, userId, 1, Bid_Mode_Enum.Read);
+            bid = new Bid(1, 1, userId, price, Bid_Mode_Enum.Read);
 
             // Assert
             Assert.Equal(expectedResult, bid.IsValid().Count == 0);
         }
 
+        [Fact]
+        public void PriceException()
+        {
+            // Arrange
+            Measure measure;
+
+            // Act & Assert
+            Assert.Throws<ArgumentOutOfRangeException>(() => measure = new Measure(-1));
+        }
+
         [Theory]
-        [InlineData(-1, false)]
         [InlineData(0, true)]
         [InlineData(1, true)]
-        public void PriceRules(decimal price, bool expectedResult)
+        public void PriceRules(int price, bool expectedResult)
         {
             // Arrange
             Bid bid;
 
             // Act
-            bid = new Bid(1, 1, "1", price, Bid_Mode_Enum.Read);
+            bid = new Bid(1, 1, "1", new Money(new Measure(price)), Bid_Mode_Enum.Read);
 
             // Assert
             Assert.Equal(expectedResult, bid.IsValid().Count == 0);
